@@ -14,7 +14,7 @@ class ExamListView(ListView):
     context_object_name = 'exams'
 
 
-class ExamDetailView(LoginRequiredMixin, DetailView,):
+class ExamDetailView(LoginRequiredMixin, DetailView, ):
     model = Exam
     template_name = 'exams/details.html'
     context_object_name = 'exam'
@@ -85,6 +85,9 @@ class ExamResultQuestionView(LoginRequiredMixin, UpdateView):
         selected_choices = ['is_selected' in form.changed_data for form in choices.forms]
         result = Result.objects.get(uuid=res_uuid)
         result.update_result(order_num, question, selected_choices)
+
+        if sum(selected_choices) != 1:
+            raise ValueError('You need to choose only 1 answer!')
 
         if result.state == Result.STATE.FINISHED:
             return HttpResponseRedirect(
